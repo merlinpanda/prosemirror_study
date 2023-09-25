@@ -13,6 +13,8 @@ function App() {
     if (editorBox.current) {
       const state = EditorState.create({
         schema,
+
+        // Plugins 会在创建 state 的时候被注册(因为它们需要访问 state 的 transactions 的权限).
         plugins: [history(), keymap({ "Mod-z": undo, "Mod-y": redo })],
       });
 
