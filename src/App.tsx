@@ -4,6 +4,10 @@ import { EditorView } from "prosemirror-view";
 import { undo, redo, history } from "prosemirror-history";
 // keymap 插件, 它用来绑定键盘输入的 actions.
 import { keymap } from "prosemirror-keymap";
+
+// prosemirror-commands 这个包提供了很多基本的编辑 commands,
+// 包括在编辑器中按照你的期望映射 enter 和 delete 按键的行为.
+import { baseKeymap } from "prosemirror-commands";
 import { useRef, useEffect } from "react";
 
 function App() {
@@ -15,7 +19,17 @@ function App() {
         schema,
 
         // Plugins 会在创建 state 的时候被注册(因为它们需要访问 state 的 transactions 的权限).
-        plugins: [history(), keymap({ "Mod-z": undo, "Mod-y": redo })],
+        plugins: [
+          history(),
+          keymap({
+            // 大多数的编辑行为都会被写成 commands 的形式，因此可以被绑定到
+            // 特定的键上, 以供编辑菜单调用, 或者暴露给用户来操作
+            "Mod-z": undo,
+            "Mod-y": redo,
+          }),
+
+          keymap(baseKeymap),
+        ],
       });
 
       const editor = new EditorView(editorBox.current, {
