@@ -1,32 +1,43 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import { EditorState } from "prosemirror-state";
+import { EditorView } from "prosemirror-view";
+import { Schema, DOMParser } from "prosemirror-model";
+import { schema } from "prosemirror-schema-basic";
+import { addListNodes } from "prosemirror-schema-list";
+import { exampleSetup } from "prosemirror-example-setup";
+import { useRef, useEffect } from "react";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const editorBox = useRef(null);
+  const editorContent = useRef(null);
+
+  useEffect(() => {
+    if (editorBox.current && editorContent.current) {
+      const mySchema = new Schema({
+        nodes: addListNodes(schema.spec.nodes, "paragraph block*", "block"),
+        marks: schema.spec.marks,
+      });
+
+      const editor = new EditorView(editorBox.current, {
+        state: EditorState.create({
+          doc: DOMParser.fromSchema(mySchema).parse(editorContent.current),
+          plugins: exampleSetup({ schema: mySchema }),
+        }),
+      });
+
+      return () => {
+        editor.destroy();
+      };
+    }
+  }, []);
+
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div ref={editorBox}>
+        <div ref={editorContent}>
+          <div className="">aaa</div>
+          <div className="">aaaasd</div>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   );
 }
