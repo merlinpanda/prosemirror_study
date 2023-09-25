@@ -10,7 +10,7 @@ import { keymap } from "prosemirror-keymap";
 import { baseKeymap } from "prosemirror-commands";
 import { useRef, useEffect, useState } from "react";
 
-import { testPlugin } from './plugins/test-plugin';
+import { testPlugin } from "./plugins/test-plugin";
 
 // JSON美化
 import JSONPretty from "react-json-pretty";
@@ -85,11 +85,21 @@ function App() {
 
   return (
     <>
-      <div>
-        <div ref={editorBox}></div>
-      </div>
-      <div className="">
-        <JSONPretty id="json-pretty" data={content}></JSONPretty>
+      <div className="flex flex-row">
+        <div className="p-6 flex-grow">
+          <div>
+            <div
+              className="border border-slate-200 rounded p-2"
+              ref={editorBox}
+            ></div>
+          </div>
+        </div>
+        <div className="flex-none w-1/4 h-screen bg-slate-800 rounded-l-lg p-6 text-white">
+          <h1 className="text-lg font-bold">Doc JSON</h1>
+          <div className="mt-4 text-xs">
+            <JSONPretty id="json-pretty" data={content}></JSONPretty>
+          </div>
+        </div>
       </div>
     </>
   );
