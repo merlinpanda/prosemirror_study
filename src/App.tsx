@@ -10,6 +10,8 @@ import { keymap } from "prosemirror-keymap";
 import { baseKeymap } from "prosemirror-commands";
 import { useRef, useEffect, useState } from "react";
 
+import { testPlugin } from './plugins/test-plugin';
+
 // JSON美化
 import JSONPretty from "react-json-pretty";
 
@@ -25,6 +27,7 @@ function App() {
         // Plugins 会在创建 state 的时候被注册(因为它们需要访问 state 的 transactions 的权限).
         plugins: [
           history(),
+          testPlugin(),
           keymap({
             // 大多数的编辑行为都会被写成 commands 的形式，因此可以被绑定到
             // 特定的键上, 以供编辑菜单调用, 或者暴露给用户来操作
