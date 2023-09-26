@@ -58,26 +58,6 @@ export const Paragraph = Node.create<ParagraphOptions>({
     };
   },
 
-  addAttributes() {
-    return {
-      blockId: {
-        default: null,
-        parseHTML: (element) => element.getAttribute("data-block-id"),
-        renderHTML: (attributes) => {
-          if (!attributes.blockId) {
-            return {
-              "data-block-id": this.storage.uuid,
-            };
-          } else {
-            return {
-              "data-block-id": attributes.blockId,
-            };
-          }
-        },
-      },
-    };
-  },
-
   addKeyboardShortcuts() {
     return {
       "Mod-Alt-0": () => this.editor.commands.setParagraph(),

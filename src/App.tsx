@@ -2,6 +2,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { Document } from "./plugins/document";
 import { UniqueID } from "./plugins/block";
 import { Paragraph } from "./plugins/paragraph";
+import { Hash } from "./plugins/hash";
 import { Text } from "./plugins/text";
 // import JSONPretty from "react-json-pretty";
 
@@ -10,6 +11,9 @@ export default function App() {
     extensions: [
       Document,
       UniqueID.configure({
+        types: ["paragraph", "image"],
+      }),
+      Hash.configure({
         types: ["paragraph", "image"],
       }),
       Paragraph,

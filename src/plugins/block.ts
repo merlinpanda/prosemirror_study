@@ -24,7 +24,7 @@ export const UniqueID = Extension.create<UniqueIDOptions>({
 
   addOptions() {
     return {
-      attributeName: "id",
+      attributeName: "block-id",
       types: [],
       generateID: () => uuidv4(),
       filterTransaction: null,
