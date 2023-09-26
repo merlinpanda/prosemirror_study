@@ -19,6 +19,7 @@ import { Schema } from "prosemirror-model";
 function App() {
   const editorBox = useRef(null);
   const [content, setContent] = useState({});
+  const [editor, setEditor] = useState<EditorView>();
 
   useEffect(() => {
     if (editorBox.current) {
@@ -31,8 +32,16 @@ function App() {
             paragraph: {
               group: "block",
               content: "text*",
-              toDOM() {
-                return ["div", 0];
+              attrs: {
+                class: {
+                  default: "stument-block",
+                },
+                "data-block-id": {
+                  default: "aa",
+                },
+              },
+              toDOM(node) {
+                return ["div", node.attrs, 0];
               },
               marks: "_",
             },
@@ -156,6 +165,8 @@ function App() {
         },
       });
 
+      setEditor(editor);
+
       return () => {
         editor.destroy();
       };
@@ -172,6 +183,37 @@ function App() {
               ref={editorBox}
             ></div>
           </div>
+          {editor && (
+            <div className="flex flex-row mt-4 gap-4">
+              <button
+                className="text-xs font-bold px-6 py-2 rounded bg-slate-300 hover:bg-slate-600 text-slate-700 hover:text-slate-200"
+                onClick={() => {
+                  const tr = editor.state.tr;
+                  if (tr) {
+                    tr.insertText("hello");
+                    const newState = editor.state.apply(tr);
+                    editor.updateState(newState);
+                    // editor.dispatch(tr);
+                    setContent(editor.state.doc.toJSON());
+                  }
+                }}
+              >
+                插入Hello
+              </button>
+              <button
+                className="text-xs font-bold px-6 py-2 rounded bg-slate-300 hover:bg-slate-600 text-slate-700 hover:text-slate-200"
+                onClick={() => {
+                  const $pos = editor.state.doc.resolve(2);
+                  console.log(editor.coordsAtPos(1));
+                  console.log(editor.coordsAtPos(2));
+                  console.log(editor.coordsAtPos(3));
+                  console.log("$pos", $pos);
+                }}
+              >
+                获取pos信息
+              </button>
+            </div>
+          )}
         </div>
         <div className="flex-none w-1/4 h-screen overflow-y-auto bg-slate-800 rounded-l-lg p-6 text-white">
           <h1 className="text-lg font-bold">Doc JSON</h1>
