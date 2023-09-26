@@ -15,16 +15,29 @@ export const Document = Node.create({
 
   addAttributes() {
     return {
-      documentId: {
+      hash: {
         default: null,
-        parseHTML: (element) => element.getAttribute("data-document-id"),
+        parseHTML: (element) => element.getAttribute("data-hash"),
         renderHTML: (attributes) => {
-          if (!attributes.documentId) {
+          if (!attributes.hash) {
             return;
           }
 
           return {
-            "data-document-id": attributes.documentId,
+            "data-hash": attributes.hash,
+          };
+        },
+      },
+      newHash: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("data-new-hash"),
+        renderHTML: (attributes) => {
+          if (!attributes.newHash) {
+            return;
+          }
+
+          return {
+            "data-new-hash": attributes.newHash,
           };
         },
       },

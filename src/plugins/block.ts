@@ -31,6 +31,11 @@ export const UniqueID = Extension.create<UniqueIDOptions>({
     };
   },
 
+  /**
+   * 添加全局属性
+   *
+   * @returns
+   */
   addGlobalAttributes() {
     return [
       {
@@ -93,6 +98,7 @@ export const UniqueID = Extension.create<UniqueIDOptions>({
             this.options.filterTransaction &&
             transactions.some((tr) => !this.options.filterTransaction?.(tr));
 
+          // 判断文档是否变更
           if (!docChanges || filterTransactions) {
             return;
           }
