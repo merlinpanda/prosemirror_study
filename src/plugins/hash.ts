@@ -29,6 +29,12 @@ export const Hash = Extension.create<HashOptions>({
     };
   },
 
+  addStorage() {
+    return {
+      hashMap: new Map<string, string>(),
+    };
+  },
+
   /**
    * 添加全局属性
    *
@@ -52,18 +58,16 @@ export const Hash = Extension.create<HashOptions>({
               };
             },
           },
-          [this.options.attributeName]: {
-            default: null,
-            parseHTML: (element) =>
-              element.getAttribute(`data-${this.options.attributeName}`),
+          changed: {
+            default: false,
+            parseHTML: (element) => element.getAttribute("data-changed"),
             renderHTML: (attributes) => {
-              if (!attributes[this.options.attributeName]) {
+              if (!attributes.changed) {
                 return {};
               }
 
               return {
-                [`data-${this.options.attributeName}`]:
-                  attributes[this.options.attributeName],
+                [`data-changed`]: attributes.changed,
               };
             },
           },
@@ -74,23 +78,18 @@ export const Hash = Extension.create<HashOptions>({
 
   // check initial content for missing ids
   onCreate() {
-    const { view, state } = this.editor;
-    const { tr, doc } = state;
-    const { types, attributeName, generateHash } = this.options;
+    const { state } = this.editor;
+
+    const { doc } = state;
+    const { types, generateHash } = this.options;
     const nodesWithoutId = findChildren(doc, (node) => {
-      return (
-        types.includes(node.type.name) && node.attrs[attributeName] === null
-      );
+      return types.includes(node.type.name) && node.attrs.currentHash === null;
     });
 
-    nodesWithoutId.forEach(({ node, pos }) => {
-      tr.setNodeMarkup(pos, undefined, {
-        ...node.attrs,
-        [attributeName]: generateHash(node.toString()),
-      });
+    nodesWithoutId.forEach(({ node }) => {
+      const currentHash = generateHash(JSON.stringify(node.content.toJSON()));
+      this.storage.hashMap.set(node.attrs["block-id"], currentHash);
     });
-
-    view.dispatch(tr);
   },
 
   addProseMirrorPlugins() {
@@ -112,7 +111,7 @@ export const Hash = Extension.create<HashOptions>({
           }
 
           const { tr } = newState;
-          const { types, attributeName, generateHash } = this.options;
+          const { types, generateHash } = this.options;
 
           // @ts-ignore
           const transform = combineTransactionSteps(oldState.doc, transactions);
@@ -133,10 +132,17 @@ export const Hash = Extension.create<HashOptions>({
                 return types.includes(node.type.name);
               },
             );
+
             newNodes.forEach(({ node, pos }) => {
+              const currentHash = generateHash(
+                JSON.stringify(node.content.toJSON()),
+              );
+
+              this.storage.hashMap.set(node.attrs["block-id"], currentHash);
+
               tr.setNodeMarkup(pos, undefined, {
                 ...node.attrs,
-                [attributeName]: generateHash(node.toString()),
+                changed: currentHash !== node.attrs["hash"],
               });
 
               return;

@@ -18,13 +18,7 @@ declare module "@tiptap/core" {
 export const Paragraph = Node.create<ParagraphOptions>({
   name: "paragraph",
 
-  priority: 999,
-
-  addStorage: () => {
-    return {
-      uuid: null,
-    };
-  },
+  priority: 1000,
 
   addOptions() {
     return {
