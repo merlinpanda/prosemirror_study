@@ -67,7 +67,11 @@ export default function App() {
                 <button
                   className="px-3 py-1 rounded bg-slate-100"
                   onClick={() =>
-                    editor.chain().focus().setComment("xxxxx").run()
+                    editor
+                      .chain()
+                      .focus()
+                      .setComment(new Date().getTime().toString())
+                      .run()
                   }
                 >
                   设置评论

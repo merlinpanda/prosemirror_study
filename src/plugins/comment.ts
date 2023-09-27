@@ -16,34 +16,75 @@ export const Comment = Mark.create({
   addOptions() {
     return {
       HTMLAttributes: {},
+      commentIdPrefix: "stument-comment-id-",
     };
   },
 
   addAttributes() {
     return {
       commentId: {
-        default: null,
-        parseHTML: (element) => element.getAttribute("data-comment-id"),
-        renderHTML(attributes) {
-          if (!attributes.commentId) {
+        default: [],
+        parseHTML: (element) => {
+          const ids: string[] = [];
+          (element as HTMLElement).classList.forEach((classname) => {
+            if (classname.indexOf(this.options.commentIdPrefix) !== -1) {
+              ids.push(classname.replace(this.options.commentIdPrefix, ""));
+            }
+          });
+
+          return ids;
+        },
+        renderHTML: (attributes) => {
+          if (attributes.commentId.length === 0) {
             return {};
           }
 
+          const classnames: string = this.options.HTMLAttributes?.class;
+
+          let classList: string[] = [];
+          if (classnames) {
+            classList = classList.concat(classnames.split(" "));
+          }
+
+          classList = classList.concat(
+            attributes.commentId.map((commentId: string) => {
+              return this.options.commentIdPrefix + commentId;
+            }),
+          );
+
           return {
-            "data-comment-id": attributes.commentId,
+            class: classList.join(" "),
           };
         },
       },
       temporaryComment: {
         default: false,
-        parseHTML: (element) => element.getAttribute("data-temporary-comment"),
-        renderHTML(attributes) {
+        parseHTML: (element) => {
+          // stument-temporary-comment
+          (element as HTMLElement).classList.forEach((classname) => {
+            if (classname.indexOf("stument-temporary-comment") !== -1) {
+              return true;
+            }
+          });
+
+          return null;
+        },
+        renderHTML: (attributes) => {
           if (!attributes.temporaryComment) {
             return {};
           }
 
+          const classnames = this.options.HTMLAttributes?.class;
+          let classList = [];
+          if (classnames) {
+            classList = classnames.split(" ");
+          }
+
+          classList.push("stument-temporary-comment");
+
+          console.log("classList", classList);
           return {
-            "data-temporary-comment": attributes.temporaryComment,
+            class: classList.join(" "),
           };
         },
       },
@@ -54,11 +95,18 @@ export const Comment = Mark.create({
     return [
       {
         tag: "span",
-        getAttrs: (node) =>
-          ((node as HTMLElement).getAttribute("data-comment-id") !== null ||
-            (node as HTMLElement).getAttribute("data-temporary-comment") !==
-              null) &&
-          null,
+        getAttrs: (node) => {
+          console.log("parseHTML");
+          return (
+            ((node as HTMLElement).classList.contains(
+              "stument-temporary-comment",
+            ) ||
+              (node as HTMLElement).className.indexOf(
+                this.options.commentIdPrefix,
+              ) !== -1) &&
+            null
+          );
+        },
       },
     ];
   },
